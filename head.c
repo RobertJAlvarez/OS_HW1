@@ -8,10 +8,10 @@
 int str_cmp(char *s1, char *s2);
 int str_to_int(char *s);
 
+//Compare two strings, return > 0 if s1 > s2, < 0 if s1 < s2, 0 if s1 == s2
 int str_cmp(char *s1, char *s2)
 {
-  while (*s1) {
-    if (*s1 != *s2) break;
+  while (*s1 && (*s1 != *s2)) {
     s1++;
     s2++;
   }
@@ -37,9 +37,8 @@ int my_write(int fd, const char *buf, size_t bytes) {
   bytes_to_be_written = bytes;
   while (bytes_to_be_written > ((size_t) 0)) {
     bytes_written_this_time = write(fd, &buf[bytes_already_written], bytes_to_be_written);
-    if (bytes_written_this_time < ((ssize_t) 0)) { //Error
+    if (bytes_written_this_time < ((ssize_t) 0)) //Error
       return -1;
-    }
     bytes_to_be_written -= (size_t) bytes_written_this_time;
     bytes_already_written += (size_t) bytes_written_this_time;
   }
@@ -53,7 +52,7 @@ int main(int argc, char **argv) {
   size_t read_bytes;  //unsigned size
 
   //Find the value of k if -n was provided
-  for (int i = 1; i < argc; i++)
+  for (int i = 1; i < argc; i++) {
     if (str_cmp(argv[i++],"-n") == 0) { // Check if the argument is -n
       if (i >= argc) {  //If there is nothing after -n
         fprintf(stderr, "head: option requires an argument -- n\nusage: head [-n lines | -c bytes] [file ...]\n");
@@ -66,7 +65,10 @@ int main(int argc, char **argv) {
         return 1;
       }
       break;
+    } else {
+      //This most be the file to read from
     }
+  }
 
   //We keep on reading until the file hits the end-of-file condition
   while (k--) {
