@@ -21,7 +21,7 @@ int str_cmp(char *s1, char *s2)
 int str_to_int(char *s)
 {
   int num = 0;
-  for (char c = *s; (c >= '0' && c <= '9'); c = *++s )
+  for (char c = *s; c >= '0' && c <= '9'; c = *++s )
     num = num*10 + c-48;
   return num;
 }
@@ -54,8 +54,16 @@ int main(int argc, char **argv) {
 
   //Find the value of k if -n was provided
   for (int i = 1; i < argc; i++)
-    if (str_cmp(argv[i],"-n") == 0) {
-      k = str_to_int(argv[++i]);
+    if (str_cmp(argv[i++],"-n") == 0) { // Check if the argument is -n
+      if (i >= argc) {  //If there is nothing after -n
+        printf("head: option requires an argument -- n\nusage: head [-n lines | -c bytes] [file ...]\n");
+        k = 0;
+        break;
+      }
+      //Get what is after -n
+      k = str_to_int(argv[i]);
+      if (k == 0) //If 0, a negative number or a non-number got input after -n
+        printf("head: illegal line count -- %s\n",argv[i]);
       break;
     }
 
