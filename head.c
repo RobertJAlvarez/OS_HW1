@@ -48,6 +48,7 @@ int my_write(int fd, const char *buf, size_t bytes) {
 int main(int argc, char **argv) {
   char buffer[BUFFER_LEN];
   int k = 10;
+  int n_lines_printed = 0;
   ssize_t read_res;   //Signed size
   size_t read_bytes;  //unsigned size
 
@@ -66,12 +67,12 @@ int main(int argc, char **argv) {
       }
       break;
     } else {
-      //This most be the file to read from
+      //This most be the file to read from,if any. Make a list of files to read from after we are done reading the inputs
     }
   }
-
+printf("k = %d\n", k);
   //We keep on reading until the file hits the end-of-file condition
-  while (k--) {
+  while (n_lines_printed++ < k) {
     //Try to read into the buffer, up to sizeof(buffer) bytes
     read_res = read(0, buffer, sizeof(buffer));
 
@@ -88,14 +89,16 @@ int main(int argc, char **argv) {
 
     //Here we known that read_res in positive.
     read_bytes = (size_t) read_res;
-    
+printf("buffer before my_write:\n%s\n",buffer);
     //We need to write all the read_bytes bytes from buffer to standard output
     if (my_write(1, buffer, read_bytes) < 0) {
       //Display the appropriate error message and die
       fprintf(stderr, "Error writting: %s\n", strerror(errno));
       return 1;
     }
+printf("n_lines_printed = %d\n", n_lines_printed);
   }
 
   return 0;
 }
+
