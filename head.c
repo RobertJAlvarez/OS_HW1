@@ -2,48 +2,9 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include "my_c.h"
 
 #define BUFFER_LEN (4096)
-
-int str_cmp(char *s1, char *s2);
-int str_to_int(char *s);
-
-//Compare two strings, return > 0 if s1 > s2, < 0 if s1 < s2, 0 if s1 == s2
-int str_cmp(char *s1, char *s2)
-{
-  while (*s1 && (*s1 != *s2)) {
-    s1++;
-    s2++;
-  }
-  return *s1 - *s2;
-}
-
-int str_to_int(char *s)
-{
-  int num = 0;
-  for (char c = *s; c >= '0' && c <= '9'; c = *++s )
-    num = num*10 + c-48;
-  return num;
-}
-
-/* Call write() until all bytes are wirtten or until
- * an error occurs. Returns 0 on success and -1 on failure
- */
-int my_write(int fd, const char *buf, size_t bytes) {
-  ssize_t bytes_to_be_written;
-  ssize_t bytes_already_written = 0;
-  ssize_t bytes_written_this_time;
-
-  bytes_to_be_written = bytes;
-  while (bytes_to_be_written > ((size_t) 0)) {
-    bytes_written_this_time = write(fd, &buf[bytes_already_written], bytes_to_be_written);
-    if (bytes_written_this_time < ((ssize_t) 0)) //Error
-      return -1;
-    bytes_to_be_written -= (size_t) bytes_written_this_time;
-    bytes_already_written += (size_t) bytes_written_this_time;
-  }
-  return 0;
-}
 
 int main(int argc, char **argv) {
   char buffer[BUFFER_LEN];
@@ -67,10 +28,10 @@ int main(int argc, char **argv) {
       }
       break;
     } else {
-      //This most be the file to read from,if any. Make a list of files to read from after we are done reading the inputs
+      //This most be the file to read from, if any. Make a list of files to read from after we are done reading the inputs
     }
   }
-printf("k = %d\n", k);
+//printf("k = %d\n", k);
   //We keep on reading until the file hits the end-of-file condition
   while (n_lines_printed++ < k) {
     //Try to read into the buffer, up to sizeof(buffer) bytes
@@ -89,14 +50,14 @@ printf("k = %d\n", k);
 
     //Here we known that read_res in positive.
     read_bytes = (size_t) read_res;
-printf("buffer before my_write:\n%s\n",buffer);
+//printf("buffer before my_write:\n%s\n",buffer);
     //We need to write all the read_bytes bytes from buffer to standard output
     if (my_write(1, buffer, read_bytes) < 0) {
       //Display the appropriate error message and die
       fprintf(stderr, "Error writting: %s\n", strerror(errno));
       return 1;
     }
-printf("n_lines_printed = %d\n", n_lines_printed);
+//printf("n_lines_printed = %d\n", n_lines_printed);
   }
 
   return 0;
