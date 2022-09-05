@@ -4,7 +4,7 @@
 #include <errno.h>
 #include <string.h>
 
-//Compare two strings, return > 0 if s1 > s2, < 0 if s1 < s2, 0 if s1 == s2
+/*Compare two strings, return > 0 if s1 > s2, < 0 if s1 < s2, 0 if s1 == s2*/
 int str_cmp(char *s1, char *s2)
 {
   while (*s1 && (*s1 == *s2)) {
@@ -39,9 +39,10 @@ char *copy_str(char *inStr, size_t bytes)
 int my_write(int fd, const char *buf, size_t bytes)
 {
   ssize_t bytes_to_be_written;
-  ssize_t bytes_already_written = 0;
+  ssize_t bytes_already_written;
   ssize_t bytes_written_this_time;
 
+  bytes_already_written = 0;
   bytes_to_be_written = bytes;
   while (bytes_to_be_written > ((size_t) 0)) {
     bytes_written_this_time = write(fd, &buf[bytes_already_written], bytes_to_be_written);

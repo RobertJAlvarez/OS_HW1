@@ -11,12 +11,13 @@
 int main(int argc, char **argv) {
   char buffer[BUFFER_LEN];
   List *files = init_LL(argc-1);
-  int k = 10;
-  int n_lines_printed = 0;
+  int k;
+  int n_lines_printed;
   ssize_t read_res;   //Signed size
   size_t read_bytes;  //unsigned size
-  int fd_r = 0;
+  int fd_r;
 
+  k = 10;
   //Find the value of k if -n was provided and save file names if any
   for (int i = 1; i < argc; i++) {
     if (str_cmp(argv[i],"-n") == 0) { // Check if the argument is -n
@@ -32,17 +33,20 @@ int main(int argc, char **argv) {
       }
       files->max_Lines -= 2; //Two arguments are -n and # so they cannot be files
     } else {
-      add_line(files, argv[i], (size_t)sizeof(argv[i]));
+      add_item(files, argv[i], (size_t)sizeof(argv[i]));
     }
   }
 
-  if (files->n_Lines == 0)
-    fd_r = 0; //No files were given, input comes from keyboard
-  else
-    fd_r = open(files->head->str, O_RDONLY); //Files were providen
+  fd_r = 0; //No files were given, input comes from keyboard
+  if (files->n_Lines != 0) {
+    fd_r = open(files->head->str, O_RDONLY); //Files were provided
+    move_head(files);
+  }
+
 //printf("%d\n",fd_r);
 //printf("k = %d\n", k);
   //We keep on reading until the file hits the end-of-file condition
+  n_lines_printed = 0;
   while (n_lines_printed++ < k) {
     //Try to read into the buffer, up to sizeof(buffer) bytes
     read_res = read(fd_r, buffer, sizeof(buffer));

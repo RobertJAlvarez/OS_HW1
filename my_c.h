@@ -1,7 +1,7 @@
 #ifndef _MY_C_
 #define _MY_C_
 
-//Compare two strings, return > 0 if str1 > str2, < 0 if str1 < str 2, 0 if str1 == str2
+/*Compare two strings, return > 0 if s1 > s2, < 0 if s1 < s2, 0 if s1 == s2*/
 int str_cmp(char *s1, char *s2);
 
 int str_to_int(char *s);
