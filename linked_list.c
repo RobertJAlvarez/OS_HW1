@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "history.h"
+#include "linked_list.h"
 #include "my_c.h"
 
 /* Initialize the linked list to keep the history. */
-List *init_history(int k)
+List *init_LL(int k)
 {
   List *p = malloc(sizeof(List));
   p->n_Lines = 0;

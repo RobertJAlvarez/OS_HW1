@@ -2,12 +2,14 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include "linked_list.h"
 #include "my_c.h"
 
 #define BUFFER_LEN (4096)
 
 int main(int argc, char **argv) {
   char buffer[BUFFER_LEN];
+  List *files = init_LL(argc-1);
   int k = 10;
   int n_lines_printed = 0;
   ssize_t read_res;   //Signed size
@@ -15,8 +17,8 @@ int main(int argc, char **argv) {
 
   //Find the value of k if -n was provided
   for (int i = 1; i < argc; i++) {
-    if (str_cmp(argv[i++],"-n") == 0) { // Check if the argument is -n
-      if (i >= argc) {  //If there is nothing after -n
+    if (str_cmp(argv[i],"-n") == 0) { // Check if the argument is -n
+      if (++i >= argc) {  //If there is nothing after -n
         fprintf(stderr, "head: option requires an argument -- n\nusage: head [-n lines | -c bytes] [file ...]\n");
         return 1;
       }
@@ -26,9 +28,8 @@ int main(int argc, char **argv) {
         fprintf(stderr, "head: illegal line count -- %s\n",argv[i]);
         return 1;
       }
-      break;
     } else {
-      //This most be the file to read from, if any. Make a list of files to read from after we are done reading the inputs
+      add_line(files, argv[i], (size_t)sizeof(argv[i]));
     }
   }
 //printf("k = %d\n", k);

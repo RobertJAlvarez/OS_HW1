@@ -1,5 +1,5 @@
-#ifndef _HISTORY_
-#define _HISTORY_
+#ifndef _LINKED_LIST_
+#define _LINKED_LIST_
 
 typedef struct s_Line {
   char *str;
@@ -15,7 +15,7 @@ typedef struct s_List {
 } List;
 
 /* Initialize the linked list to keep the history. */
-List *init_history(int k);
+List *init_LL(int k);
 
 /* Add a history item to the end of the list.
    List* list - the linked list

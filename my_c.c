@@ -21,7 +21,12 @@ int str_to_int(char *s)
     num = num*10 + c-48;
   return num;
 }
-
+/*
+char str_len(*s)
+{
+  //
+}
+*/
 /* Returns a freshly allocated new zero-terminated string containing <len> chars from <inStr> */
 char *copy_str(char *inStr, size_t bytes)
 {
