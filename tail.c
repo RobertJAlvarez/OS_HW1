@@ -1,7 +1,7 @@
-#include <unistd.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
+#include <unistd.h>     //read()
+#include <stdio.h>      //fprintf(), stderr
+#include <errno.h>      //errno
+#include <string.h>     //strerror()
 #include "linked_list.h"
 #include "my_c.h"
 

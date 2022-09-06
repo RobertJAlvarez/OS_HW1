@@ -1,7 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
+#include <stdio.h>      //fprintf(), stderr
+#include <stdlib.h>     //malloc(), free()
+#include <string.h>     //strerror()
+#include <errno.h>      //errno
 #include "linked_list.h"
 #include "my_c.h"
 

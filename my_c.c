@@ -1,8 +1,5 @@
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
+#include <stdlib.h> //malloc()
+#include <unistd.h> //write()
 
 /*Compare two strings, return > 0 if s1 > s2, < 0 if s1 < s2, 0 if s1 == s2*/
 int str_cmp(char *s1, char *s2)
