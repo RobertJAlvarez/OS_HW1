@@ -2,7 +2,7 @@ CC     = gcc
 OBJS   = my_c.o linked_list.o
 CFLAGS = -g3 -Wall -Wextra -O0 # -W* for warnings, -g3 for maximum debug, -O0 for no optimization
 
-all: head
+all: head tail
 
 head: $(OBJS) head.o
 	$(CC) $(CFLAGS) -o $@ $^
