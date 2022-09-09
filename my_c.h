@@ -9,6 +9,8 @@ int str_to_int(char *s);
 /* Returns a freshly allocated new zero-terminated string containing <len> chars from <inStr> */
 char *copy_str(char *inStr, short len);
 
+size_t get_line_bytes(char *buf, size_t rem);
+
 /* Call write() until all bytes are written or until
  * an error occurs. Returns 0 on success and -1 on failure
  */

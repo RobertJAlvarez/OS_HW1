@@ -3,21 +3,23 @@
 #include <stdio.h>      //fprintf(), stderr
 #include <errno.h>      //errno
 #include <string.h>     //strerror()
-#include "linked_list.h"
 #include "my_c.h"
 
 #define BUFFER_LEN (4096)
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   char buffer[BUFFER_LEN];
-  List *files = init_LL(argc-1);
+  char *file = NULL;
   int k;
   int n_lines_printed;
-  ssize_t read_res;   //Signed size
-  size_t read_bytes;  //unsigned size
+  ssize_t read_res;
+  size_t remaining_bytes;
+  size_t bytes_written;
+  size_t line_bytes;
   int fd_r;
 
-  k = 10;
+  k = 10;   //Assume there was no -n # provided
   //Find the value of k if -n was provided and save file names if any
   for (int i = 1; i < argc; i++) {
     if (str_cmp(argv[i],"-n") == 0) { // Check if the argument is -n
@@ -31,23 +33,19 @@ int main(int argc, char **argv) {
         fprintf(stderr, "head: illegal line count -- %s\n",argv[i]);
         return 1;
       }
-      files->max_Lines -= 2; //Two arguments are -n and # so they cannot be files
     } else {
-      add_item(files, argv[i], (size_t)sizeof(argv[i]));
+      file = argv[i];
     }
   }
 
-  fd_r = 0; //No files were given, input comes from keyboard
-  if (files->n_Lines != 0) {
-    fd_r = open(files->head->str, O_RDONLY); //Files were provided
-    move_head(files);
-  }
+  fd_r = 0; //Assume no file were given, input comes from keyboard
+  //Get file descriptor if any
+  if (file != NULL)
+    fd_r = open(file, O_RDONLY);
 
-//printf("%d\n",fd_r);
-//printf("k = %d\n", k);
   //We keep on reading until the file hits the end-of-file condition
   n_lines_printed = 0;
-  while (n_lines_printed++ < k) {
+  while (n_lines_printed < k) {
     //Try to read into the buffer, up to sizeof(buffer) bytes
     read_res = read(fd_r, buffer, sizeof(buffer));
 
@@ -63,15 +61,21 @@ int main(int argc, char **argv) {
     }
 
     //Here we known that read_res in positive.
-    read_bytes = (size_t) read_res;
-//printf("buffer before my_write:\n%s\n",buffer);
-    //We need to write all the read_bytes bytes from buffer to standard output
-    if (my_write(1, buffer, read_bytes) < 0) {
-      //Display the appropriate error message and die
-      fprintf(stderr, "Error writting: %s\n", strerror(errno));
-      return 1;
+    remaining_bytes = (size_t) read_res;
+
+    bytes_written = (size_t) 0;
+    while ((remaining_bytes > (size_t) 0) && (n_lines_printed < k)) {
+      line_bytes = get_line_bytes(&buffer[bytes_written], remaining_bytes);
+      //We need to write all the remaining_bytes bytes from buffer to standard output
+      if (my_write(1, &buffer[bytes_written], line_bytes) < 0) {
+        //Display the appropriate error message and die
+        fprintf(stderr, "Error writting: %s\n", strerror(errno));
+        return 1;
+      }
+      remaining_bytes -= line_bytes;
+      bytes_written += line_bytes;
+      n_lines_printed++;
     }
-//printf("n_lines_printed = %d\n", n_lines_printed);
   }
 
   if (fd_r != 0)

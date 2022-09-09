@@ -30,16 +30,27 @@ char *copy_str(char *inStr, size_t bytes)
   return new_str;
 }
 
+size_t get_line_bytes(char *buf, size_t rem)
+{
+  size_t n_bytes;
+  n_bytes = (size_t) 0;
+  while (buf[n_bytes] != '\n' && n_bytes < rem)
+    n_bytes++;
+  if (buf[n_bytes] == '\n')
+    n_bytes++;
+  return n_bytes;
+}
+
 /* Call write() until all bytes are written or until
  * an error occurs. Returns 0 on success and -1 on failure
  */
 int my_write(int fd, const char *buf, size_t bytes)
 {
-  ssize_t bytes_to_be_written;
-  ssize_t bytes_already_written;
+  size_t bytes_to_be_written;
+  size_t bytes_already_written;
   ssize_t bytes_written_this_time;
 
-  bytes_already_written = 0;
+  bytes_already_written = (size_t) 0;
   bytes_to_be_written = bytes;
   while (bytes_to_be_written > ((size_t) 0)) {
     bytes_written_this_time = write(fd, &buf[bytes_already_written], bytes_to_be_written);
