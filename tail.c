@@ -1,5 +1,5 @@
 #include <fcntl.h>      //open(), close()
-#include <unistd.h>     //read()
+#include <unistd.h>     //read(), ssize_t
 #include <stdio.h>      //fprintf(), stderr
 #include <errno.h>      //errno
 #include <string.h>     //strerror()
@@ -7,6 +7,18 @@
 #include "my_c.h"
 
 #define BUFFER_LEN (4096)
+
+void close_prog(List *LL, int fd, const char str[]);
+
+void close_prog(List *LL, int fd, const char str[])
+{
+  if (*str != '\0')
+    fprintf(stderr, "%s", str);
+  //deallocate everything that has been allocated
+  if (fd != 0)
+    close(fd);
+  free_history(LL);
+}
 
 int main(int argc, char **argv)
 {
@@ -20,13 +32,12 @@ int main(int argc, char **argv)
   size_t bytes_read;
   size_t line_bytes;
   int fd;
-  //char *n_char = "-n";
 
   //Find the value of k if -n was provided and save file names if any
   k = 10;   //Assume there was no -n # provided
   for (int i = 1; i < argc; i++) {
     //if (str_cmp(argv[i],n_char) == 0) { // Check if the argument is -n
-    if (str_cmp(argv[i],"-n") == 0) { // Check if the argument is -n
+    if (str_cmp(argv[i],(char *)"-n") == 0) { // Check if the argument is -n
       if (++i >= argc) {  //If there is nothing after -n
         fprintf(stderr, "head: option requires an argument -- n\nusage: head [-n lines | -c bytes] [file ...]\n");
         return 1;
@@ -47,7 +58,7 @@ int main(int argc, char **argv)
 
   //Get file descriptor
   fd = (file != NULL ? open(file, O_RDONLY) : 0);
-//printf("Hi");
+
   //Keep reading until the file hits the end-of-file condition
   while (1) {
     //Try to read into the buffer, up to sizeof(buffer) bytes
@@ -59,8 +70,8 @@ int main(int argc, char **argv)
     if (read_res == ((ssize_t) 0)) break;
     //If the returned value is negative, we have an error and we die
     if (read_res < ((ssize_t) 0)) {
-      //Display the appropriate error message and die
       fprintf(stderr, "Error reading: %s\n", strerror(errno));
+      close_prog(LL, fd, "");
       return 1;
     }
 
@@ -71,24 +82,27 @@ int main(int argc, char **argv)
     while (remaining_bytes > (size_t) 0) {
       line_bytes = get_line_bytes(&buffer[bytes_read], remaining_bytes);
       temp_str = copy_str(&buffer[bytes_read],line_bytes);
+      //If space to copy new line couldn't be allocate
       if (temp_str == NULL) {
-        fprintf(stderr, "Could not allocate any more memory.'n");
-        //deallocate everything that has been allocated
-        free_history(LL);
+        close_prog(LL, fd, "Could not allocate any more memory.\n");
         return 1;
       }
-      add_item(LL, temp_str, line_bytes);
+      if (add_item(LL, temp_str, line_bytes) < (ssize_t) 0) {     //Space to add another item couldn't be allocated
+        close_prog(LL, fd, "Could not allocate any more memory.\n");
+        return 1;
+      }
       remaining_bytes -= line_bytes;
       bytes_read += line_bytes;
     }
   }
 
-  if (fd != 0)
-    close(fd);
+  if (print_lines(LL) < (ssize_t) 0) {
+    fprintf(stderr, "Error writing: %s\n", strerror(errno));
+    close_prog(LL, fd, "");
+    return 1;
+  }
 
-  print_lines(LL);
-  free_history(LL);
-
+  close_prog(LL, fd, "");
   return 0;
 }
 

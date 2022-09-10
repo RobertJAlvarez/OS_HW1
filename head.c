@@ -1,5 +1,5 @@
 #include <fcntl.h>      //open(), close()
-#include <unistd.h>     //read()
+#include <unistd.h>     //read(), ssize_t
 #include <stdio.h>      //fprintf(), stderr
 #include <errno.h>      //errno
 #include <string.h>     //strerror()
@@ -67,7 +67,7 @@ int main(int argc, char **argv)
       //We need to write all the remaining_bytes bytes from buffer to standard output
       if (my_write(1, &buffer[bytes_written], line_bytes) < 0) {
         //Display the appropriate error message and die
-        fprintf(stderr, "Error writting: %s\n", strerror(errno));
+        fprintf(stderr, "Error writing: %s\n", strerror(errno));
         return 1;
       }
       remaining_bytes -= line_bytes;

@@ -1,7 +1,5 @@
-#include <stdio.h>      //fprintf(), stderr
+#include <unistd.h>     //ssize_t
 #include <stdlib.h>     //malloc(), free()
-#include <string.h>     //strerror()
-#include <errno.h>      //errno
 #include "linked_list.h"
 #include "my_c.h"
 
@@ -19,14 +17,12 @@ List *init_LL(int k)
 /* Add a history item to the end of the list.
    List* list - the linked list
    char* str - the string to store */
-void add_item(List *list, char *str, size_t length)
+ssize_t add_item(List *list, char *str, size_t length)
 {
   Item *new = malloc(sizeof(Item));
-  
-  if (new == NULL) {
-    fprintf(stderr, "Could not allocate any more memory.'n");
-    return;
-  }
+
+  if (new == NULL) return -1;
+
   if (list->head == NULL) {   //If list is empty
     list->n_Lines = 1;
     list->head = new;
@@ -42,7 +38,7 @@ void add_item(List *list, char *str, size_t length)
   new->str = str;
   new->length = length;
   new->next = NULL;
-  return;
+  return 0;
 }
 
 /*Move head one up and free space used by previous head*/
@@ -62,17 +58,15 @@ void move_head(List *list)
 }
 
 /*Print the entire contents of the list. */
-void print_lines(List *list)
+ssize_t print_lines(List *list)
 {
   Item *curr = list->head;
   while (curr != NULL) {
-    if (my_write(1, curr->str, curr->length) < 0) {
-      fprintf(stderr, "Error writting: %s\n", strerror(errno));
-      break;
-    }
+    if (my_write(1, curr->str, curr->length) < 0)
+      return -1;
     curr = curr->next;
   }
-  return;
+  return 0;
 }
 
 /*Free item space use in malloc. */
