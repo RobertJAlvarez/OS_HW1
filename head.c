@@ -17,10 +17,10 @@ int main(int argc, char **argv)
   size_t remaining_bytes;
   size_t bytes_written;
   size_t line_bytes;
-  int fd_r;
+  int fd;
 
-  k = 10;   //Assume there was no -n # provided
   //Find the value of k if -n was provided and save file names if any
+  k = 10;   //Assume there was no -n # provided
   for (int i = 1; i < argc; i++) {
     if (str_cmp(argv[i],"-n") == 0) { // Check if the argument is -n
       if (++i >= argc) {  //If there is nothing after -n
@@ -38,16 +38,14 @@ int main(int argc, char **argv)
     }
   }
 
-  fd_r = 0; //Assume no file were given, input comes from keyboard
-  //Get file descriptor if any
-  if (file != NULL)
-    fd_r = open(file, O_RDONLY);
+  //Get file descriptor
+  fd = (file != NULL ? open(file, O_RDONLY) : 0);
 
   //We keep on reading until the file hits the end-of-file condition
   n_lines_printed = 0;
   while (n_lines_printed < k) {
     //Try to read into the buffer, up to sizeof(buffer) bytes
-    read_res = read(fd_r, buffer, sizeof(buffer));
+    read_res = read(fd, buffer, sizeof(buffer));
 
     //Handle the return values of the read system call
 
@@ -78,8 +76,8 @@ int main(int argc, char **argv)
     }
   }
 
-  if (fd_r != 0)
-    close(fd_r);
+  if (fd != 0)
+    close(fd);
 
   return 0;
 }

@@ -1,6 +1,8 @@
 CC     = gcc
 OBJS   = my_c.o linked_list.o
-CFLAGS = -g3 -Wall -Wextra -O0 # -W* for warnings, -g3 for maximum debug, -O0 for no optimization
+# -W* for warnings, -g3 for maximum debug, -O0 for no optimization
+CFLAGS = -Wall -Wextra -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-prototypes -Wwrite-strings -Waggregate-return \
+         -Wcast-qual -Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal -g3 -O0
 
 all: head tail
 

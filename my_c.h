@@ -7,7 +7,7 @@ int str_cmp(char *s1, char *s2);
 int str_to_int(char *s);
 
 /* Returns a freshly allocated new zero-terminated string containing <len> chars from <inStr> */
-char *copy_str(char *inStr, short len);
+char *copy_str(char *inStr, size_t len);
 
 size_t get_line_bytes(char *buf, size_t rem);
 
