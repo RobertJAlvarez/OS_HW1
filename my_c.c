@@ -36,8 +36,8 @@ char *copy_str(char *inStr, size_t bytes)
   char *new_str = malloc(bytes); //1 extra because of '\0'
   if (new_str == NULL) return NULL; //Not enough space in malloc
   char *temp = new_str; //save starting position of the new string
-  //while ((bytes-=sizeof(char))>=0)
-  while (((bytes-=sizeof(char)) >= 0) && (*temp++ = *inStr++));
+  bytes++;  //bytes can only be >= 0 because size_t can only hold positive numbers, so we add one and stop at 0
+  while (((bytes-=sizeof(char)) > 0) && (*temp++ = *inStr++));
   return new_str;
 }
 
