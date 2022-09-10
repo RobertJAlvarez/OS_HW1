@@ -19,26 +19,26 @@ int str_to_int(char *s)
   return num;
 }
 
+size_t get_line_bytes(char *buf, size_t rem)
+{
+  size_t n_bytes;
+  n_bytes = (size_t) 0;
+  while (buf[n_bytes] != '\n' && n_bytes < rem)
+    n_bytes += sizeof(char);
+  if (buf[n_bytes] == '\n')
+    n_bytes += sizeof(char);
+  return n_bytes;
+}
+
 /* Returns a freshly allocated new zero-terminated string containing <len> chars from <inStr> */
 char *copy_str(char *inStr, size_t bytes)
 {
   char *new_str = malloc(bytes); //1 extra because of '\0'
   if (new_str == NULL) return NULL; //Not enough space in malloc
   char *temp = new_str; //save starting position of the new string
-  while ((bytes-=sizeof(char))>=0)
-    *temp++ = *inStr++;
+  //while ((bytes-=sizeof(char))>=0)
+  while (((bytes-=sizeof(char)) >= 0) && (*temp++ = *inStr++));
   return new_str;
-}
-
-size_t get_line_bytes(char *buf, size_t rem)
-{
-  size_t n_bytes;
-  n_bytes = (size_t) 0;
-  while (buf[n_bytes] != '\n' && n_bytes < rem)
-    n_bytes++;
-  if (buf[n_bytes] == '\n')
-    n_bytes++;
-  return n_bytes;
 }
 
 /* Call write() until all bytes are written or until

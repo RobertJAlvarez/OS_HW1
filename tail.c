@@ -11,18 +11,21 @@
 int main(int argc, char **argv)
 {
   List *LL = NULL;
-  char buffer[BUFFER_LEN];
   char *file = NULL;
+  char *temp_str = NULL;
+  char buffer[BUFFER_LEN];
   int k;
   ssize_t read_res;
   size_t remaining_bytes;
   size_t bytes_read;
   size_t line_bytes;
-  int fd_r;
+  int fd;
+  //char *n_char = "-n";
 
-  k = 10;   //Assume there was no -n # provided
   //Find the value of k if -n was provided and save file names if any
+  k = 10;   //Assume there was no -n # provided
   for (int i = 1; i < argc; i++) {
+    //if (str_cmp(argv[i],n_char) == 0) { // Check if the argument is -n
     if (str_cmp(argv[i],"-n") == 0) { // Check if the argument is -n
       if (++i >= argc) {  //If there is nothing after -n
         fprintf(stderr, "head: option requires an argument -- n\nusage: head [-n lines | -c bytes] [file ...]\n");
@@ -39,17 +42,16 @@ int main(int argc, char **argv)
     }
   }
 
+  //Initialize linked list to hold at most k lines
   LL = init_LL(k);
 
-  fd_r = 0; //Assume no file were given, input comes from keyboard
-  //Get file descriptor if any
-  if (file != NULL)
-    fd_r = open(file, O_RDONLY);
-
-  //We keep on reading until the file hits the end-of-file condition
+  //Get file descriptor
+  fd = (file != NULL ? open(file, O_RDONLY) : 0);
+//printf("Hi");
+  //Keep reading until the file hits the end-of-file condition
   while (1) {
     //Try to read into the buffer, up to sizeof(buffer) bytes
-    read_res = read(fd_r, buffer, sizeof(buffer));
+    read_res = read(fd, buffer, sizeof(buffer));
 
     //Handle the return values of the read system call
 
@@ -68,16 +70,24 @@ int main(int argc, char **argv)
     bytes_read = (size_t) 0;
     while (remaining_bytes > (size_t) 0) {
       line_bytes = get_line_bytes(&buffer[bytes_read], remaining_bytes);
-      add_item(LL, copy_str(&buffer[bytes_read],line_bytes), line_bytes);
+      temp_str = copy_str(&buffer[bytes_read],line_bytes);
+      if (temp_str == NULL) {
+        fprintf(stderr, "Could not allocate any more memory.'n");
+        //deallocate everything that has been allocated
+        free_history(LL);
+        return 1;
+      }
+      add_item(LL, temp_str, line_bytes);
       remaining_bytes -= line_bytes;
       bytes_read += line_bytes;
     }
   }
 
-  if (fd_r != 0)
-    close(fd_r);
+  if (fd != 0)
+    close(fd);
 
   print_lines(LL);
+  free_history(LL);
 
   return 0;
 }

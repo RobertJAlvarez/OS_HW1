@@ -23,6 +23,10 @@ void add_item(List *list, char *str, size_t length)
 {
   Item *new = malloc(sizeof(Item));
   
+  if (new == NULL) {
+    fprintf(stderr, "Could not allocate any more memory.'n");
+    return;
+  }
   if (list->head == NULL) {   //If list is empty
     list->n_Lines = 1;
     list->head = new;
