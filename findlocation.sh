@@ -1,11 +1,7 @@
 #!/bin/bash
-if [ -z "$1" ] || [ 1000000 -lt $1 ] || [ 100000 -gt $1 ]
+if [ -z "$1" ] || [[ ! $1 =~ ^[[:digit:]]+$ ]]
 then
-  for value in {0..9}
-  do
-    echo -n $value
-  done
-  echo
+  echo "Enter a North American phone number prefix with only the first 6 numbers"
   exit 1
 fi
 
@@ -13,7 +9,7 @@ line=$( grep $1 nanpa )
 
 if [ -z "$line" ]
 then
-  echo "Code didn't match an North American phone number prefix in nanpa."
+  echo "Code didn't match a North American phone number prefix in nanpa."
   exit 1
 fi
 
