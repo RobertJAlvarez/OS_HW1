@@ -1,8 +1,8 @@
-#include <fcntl.h>      //open(), close()
-#include <unistd.h>     //read(), ssize_t
-#include <stdio.h>      //fprintf(), stderr
-#include <errno.h>      //errno
-#include <string.h>     //strerror()
+#include <fcntl.h>  //open(), close()
+#include <unistd.h> //read(), ssize_t
+#include <stdio.h>  //fprintf(), stderr
+#include <errno.h>  //errno
+#include <string.h> //strerror()
 #include "my_c.h"
 
 #define BUFFER_LEN (4096)
