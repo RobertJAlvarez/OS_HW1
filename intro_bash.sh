@@ -1,4 +1,4 @@
-##!bin/bash
+#!/bin/bash
 echo -----------------------------
 echo "Number of active users"
 who | wc -l
