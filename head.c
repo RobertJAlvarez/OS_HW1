@@ -61,6 +61,10 @@ int main(int argc, char **argv)
     //Here we known that read_res in positive.
     remaining_bytes = (size_t) read_res;
 
+    //If buffer was filled but we didn't got to the end of the line
+    if ((remaining_bytes == sizeof(buffer)) && (buffer[remaining_bytes-1] != '\n'))
+      n_lines_printed--;
+
     bytes_written = (size_t) 0;
     while ((remaining_bytes > (size_t) 0) && (n_lines_printed < k)) {
       line_bytes = get_line_bytes(&buffer[bytes_written], remaining_bytes);
