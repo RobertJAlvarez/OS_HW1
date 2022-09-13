@@ -6,86 +6,150 @@
 #include <string.h>   //strerror()
 #include "my_c.h"     //my_write()
 
-int only_digits(char *s);
+typedef struct {
+ char number[6];
+ char place[25];
+ char newline;
+} entry_t;
+
+size_t str_len(char *s)
+{
+  char *c;
+  for (c = s; *c != '\0'; c++);
+  return ((size_t) (c - s));
+}
+
+void close_file(int fd, const char *filename)
+{
+  if (close(fd) < 0)
+    fprintf(stderr, "Error closing file \"%s\": %s\n", filename, strerror(errno));
+}
+
 int only_digits(char *s)
 {
-  for (char c=*s; c >= '0' && c <= '9'; c=*++s);
-  return *s == '\0' ? 1 : 0;
+  char count = 0;
+  for (char c=*s; c >= '0' && c <= '9'; c=*++s, count++);
+  return count == 6 ? 1 : 0;
 }
 
-size_t trim_bytes(char *s);
-size_t trim_bytes(char *s)
+int compare_entries(char *s1, char *s2)
 {
-  //
+  char *t1;
+  char *t2;
 
-  return 0;
+  for (t1 = s1, t2 = s2; *t1 && (*t1 == *t2); t1++, t2++);
+
+  if ((t1 - s1) == 6)
+    return 0;
+  return *t1 - *t2;
 }
 
-size_t find_number(char *ptr, size_t low_line, size_t high_line);
-size_t find_number(char *ptr, size_t low_line, size_t high_line)
+char *lookup_time(entry_t dict[], ssize_t num_entries, char *number)
 {
-  size_t n_line = 0;
+  ssize_t l, r, m;
+  int cmp;
 
-  //
+  l = (ssize_t) 0;
+  r = num_entries - ((ssize_t) 1);
 
-  return n_line;
+  while (l <= r) {
+    m = (l + r) / ((ssize_t) 2);
+    cmp = compare_entries(dict[m].number, number);
+    if (cmp == 0)
+      return dict[m].place;
+
+    if (cmp < 0)
+      l = m + ((ssize_t) 1);
+    else
+      r = m - ((ssize_t) 1);
+  }
+
+  return NULL;
 }
 
-void print_city(char *ptr)
+void print_trimmed(char *ptr)
 {
-  my_write(1,ptr,26*sizeof(char)-trim_bytes(ptr));
-}
+  char *last_no_space;
 
-void my_unmap(char *ptr, size_t file_size);
-void my_unmap(char *ptr, size_t file_size)
-{
-  if (munmap(ptr, file_size) != 0)
-    printf("UnMapping failed\n");
+  for (int i = 0; i < 25; i++) {
+    if (ptr[i] != ' ')
+      last_no_space = &ptr[i];
+  }
+
+  my_write(1, copy_str(ptr, (size_t) (last_no_space-ptr+1)), (size_t) (last_no_space-ptr+1));
 }
 
 int main(int argc, char **argv)
 {
-  const char *file = "nanpa";
+  char *filename;
+  char *number;
+  char *temp;
   int fd;
   char *ptr = NULL;
-  const size_t max_lines = 166482;
-  const size_t file_size = max_lines*32;  //There are 32 bytes per line
-  size_t at_line = (size_t) 0;
-  size_t start_place = (size_t) 0;
+  off_t lseek_res;
+  size_t file_size;
+  char *place;
 
   //if first argument is not given or if first argument have anything that is not a number
-  if ((argc == 1) || !only_digits(argv[1])) {
-    printf("Enter a North American phone number prefix with only the first 6 numbers.\n");
+  if ((argc < 3) || !only_digits(argv[2])) {
+    temp = "Enter a North American phone number prefix with only the first 6 numbers.";
+    my_write(1, temp, str_len(temp));
     return 1;
   }
 
-  fd = open(file, O_RDONLY);
+  filename = argv[1];
+  number = argv[2];
+
+  fd = open(filename, O_RDONLY);
+  
+  if (fd < 0) {
+    fprintf(stderr, "Error opening file \"%s\": %s\n", filename, strerror(errno));
+    return 1;
+  }
+
+  lseek_res = lseek(fd, (off_t) 0, SEEK_END);
+
+  if (lseek_res == (off_t) -1) {
+    fprintf(stderr, "Error seeking in file \"%s\": %s\n", filename, strerror(errno));
+    close_file(fd, filename);
+    return 1;
+  }
+
+  file_size = (size_t) lseek_res;
+
+  if ((file_size % sizeof(entry_t)) != ((size_t) 0)) {
+    fprintf(stderr, "The file \"%s\" is not properly formatted.\n", filename);
+    close_file(fd, filename);
+    return 1;
+  }
+
   ptr = mmap(NULL, file_size, PROT_READ, MAP_SHARED, fd, 0);
 
-  close(fd);
+  close_file(fd, filename);
 
   if (ptr == MAP_FAILED) {
-    printf("Mapping Failed\n");
+    fprintf(stderr, "Error mapping file \"%s\" in memory : %s\n", filename, strerror(errno));
     return 1;
   }
 
   //Find location of number on file
-  at_line = find_number(ptr,0,max_lines);
+  place = lookup_time((entry_t *) ptr, ((ssize_t) (file_size / sizeof(entry_t))), number);
 
   //If line was not found, print error message and die
-  if (at_line < 0) {
-    printf("Code didn't match a North American phone number prefix in nanpa.");
-    my_unmap(ptr, file_size);
+  if (place == NULL) {
+    fprintf(stderr, "Code didn't match a North American phone number with prefix %s in nanpa.", number);
+  } else {
+    temp = "Place: ";
+    my_write(1, temp, str_len(temp));
+    print_trimmed(place);
+    my_write(1, "\n", 2);
+  }
+
+  if (munmap(ptr, file_size) != 0) {
+    fprintf(stderr, "Error unmapping file \"%s\" in memory : %s", filename, strerror(errno));
     return 1;
   }
 
-  //City start 6 characters after number does
-  start_place = 32*at_line*sizeof(char) + 6*sizeof(char);
-
-  //Output city and state where number belong to
-  print_city(&ptr[start_place]);
-
-  my_unmap(ptr, file_size);
   return 0;
 }
 
