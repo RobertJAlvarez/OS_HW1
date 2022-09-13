@@ -8,8 +8,6 @@
 
 #define BUFFER_LEN (4096)
 
-void close_prog(List *LL, int fd, const char str[]);
-
 void close_prog(List *LL, int fd, const char str[])
 {
   if (*str != '\0')
