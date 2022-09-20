@@ -19,6 +19,13 @@ int str_to_int(char *s)
   return num;
 }
 
+size_t str_len(char *s)
+{
+  char *c;
+  for (c = s; *c != '\0'; c++);
+  return ((size_t) (c - s));
+}
+
 size_t get_line_bytes(char *buf, size_t rem)
 {
   size_t n_bytes;
@@ -39,6 +46,18 @@ char *copy_str(char *inStr, size_t bytes)
   bytes++;  //bytes can only be >= 0 because size_t can only hold positive numbers, so we add one and stop at 0
   while (((bytes-=sizeof(char)) > 0) && (*temp++ = *inStr++));
   return new_str;
+}
+
+char *concat(char *s1, char *s2)
+{
+  size_t new_len = str_len(s1) + str_len(s2) - ((size_t) 1);
+  char *new_str = malloc(new_len);
+  if (new_str == NULL) return NULL; //Not enough space in malloc
+  char *temp = new_str;
+  while ( (*new_str++ = *s1++) );
+  new_str--;
+  while ( (*new_str++ = *s2++) );
+  return temp;
 }
 
 /* Call write() until all bytes are written or until

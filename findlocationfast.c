@@ -1,6 +1,6 @@
 #include <fcntl.h>    //open(), close()
 #include <unistd.h>   //read(), lseek(), ssize_t
-#include <stdio.h>    //fprintf(), stderr
+#include <stdio.h>    //fileno(), stderr
 #include <sys/mman.h> //mmap(), munmap()
 #include <errno.h>    //errno
 #include <string.h>   //strerror()
@@ -12,17 +12,16 @@ typedef struct {
  char newline;
 } entry_t;
 
-size_t str_len(char *s)
+void close_file(int fd, char *filename)
 {
-  char *c;
-  for (c = s; *c != '\0'; c++);
-  return ((size_t) (c - s));
-}
-
-void close_file(int fd, const char *filename)
-{
-  if (close(fd) < 0)
-    fprintf(stderr, "Error closing file \"%s\": %s\n", filename, strerror(errno));
+  char *temp;
+  temp = concat("Error closing file \"", filename);
+  temp = concat(temp, "\": ");
+  temp = concat(temp, strerror(errno));
+  temp = concat(temp, "\n");
+  if (close(fd) < 0) {
+    my_write(fileno(stderr), temp, str_len(temp));
+  }
 }
 
 int only_digits(char *s)
@@ -103,14 +102,22 @@ int main(int argc, char **argv)
   fd = open(filename, O_RDONLY);
   
   if (fd < 0) {
-    fprintf(stderr, "Error opening file \"%s\": %s\n", filename, strerror(errno));
+    temp = concat("Error opening file \"", filename);
+    temp = concat(temp, "\": ");
+    temp = concat(temp, strerror(errno));
+    temp = concat(temp, "\n");
+    my_write(fileno(stderr), temp, str_len(temp));
     return 1;
   }
 
   lseek_res = lseek(fd, (off_t) 0, SEEK_END);
 
   if (lseek_res == (off_t) -1) {
-    fprintf(stderr, "Error seeking in file \"%s\": %s\n", filename, strerror(errno));
+    temp = concat("Error seeking file \"", filename);
+    temp = concat(temp, "\": ");
+    temp = concat(temp, strerror(errno));
+    temp = concat(temp, "\n");
+    my_write(fileno(stderr), temp, str_len(temp));
     close_file(fd, filename);
     return 1;
   }
@@ -118,7 +125,9 @@ int main(int argc, char **argv)
   file_size = (size_t) lseek_res;
 
   if ((file_size % sizeof(entry_t)) != ((size_t) 0)) {
-    fprintf(stderr, "The file \"%s\" is not properly formatted.\n", filename);
+    temp = concat("The file \"", filename);
+    temp = concat(temp, "\" is not properly formatted.\n");
+    my_write(fileno(stderr), temp, str_len(temp));
     close_file(fd, filename);
     return 1;
   }
@@ -128,7 +137,11 @@ int main(int argc, char **argv)
   close_file(fd, filename);
 
   if (ptr == MAP_FAILED) {
-    fprintf(stderr, "Error mapping file \"%s\" in memory : %s\n", filename, strerror(errno));
+    temp = concat("Error mapping file \"", filename);
+    temp = concat(temp, "\" in memory: ");
+    temp = concat(temp, strerror(errno));
+    temp = concat(temp, "\n");
+    my_write(fileno(stderr), temp, str_len(temp));
     return 1;
   }
 
@@ -137,7 +150,9 @@ int main(int argc, char **argv)
 
   //If line was not found, print error message and die
   if (place == NULL) {
-    fprintf(stderr, "Code didn't match a North American phone number with prefix %s in nanpa.", number);
+    temp = concat("Code didn't match a North American phone number with prefix ", number);
+    temp = concat(temp, " in nanpa.");
+    my_write(fileno(stderr), temp, str_len(temp));
   } else {
     temp = "Place: ";
     my_write(1, temp, str_len(temp));
@@ -146,7 +161,11 @@ int main(int argc, char **argv)
   }
 
   if (munmap(ptr, file_size) != 0) {
-    fprintf(stderr, "Error unmapping file \"%s\" in memory : %s", filename, strerror(errno));
+    temp = concat("Error unmapping file \"", filename);
+    temp = concat(temp, "\" in memory: ");
+    temp = concat(temp, strerror(errno));
+    temp = concat(temp, "\n");
+    my_write(fileno(stderr), temp, str_len(temp));
     return 1;
   }
 
