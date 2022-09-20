@@ -25,7 +25,7 @@ int main(int argc, char **argv)
   for (int i = 1; i < argc; i++) {
     if (str_cmp(argv[i],"-n") == 0) { // Check if the argument is -n
       if (++i >= argc) {  //If there is nothing after -n
-        temp = "head: option requires an argument -- n\nusage: head [-n lines | -c bytes] [file ...]\n";
+        temp = "head: option requires an argument -- n\nusage: head [-n lines] [file]\n";
         my_write(fileno(stderr), temp, str_len(temp));
         return 1;
       }
@@ -93,7 +93,7 @@ int main(int argc, char **argv)
 
   if (fd != 0) {
     if (close(fd) < 0) {
-      temp = concat("Error closing file \"", filename);
+      temp = concat("Error closing file \"", file);
       temp = concat(temp, "\": ");
       temp = concat(temp, strerror(errno));
       temp = concat(temp, "\n");

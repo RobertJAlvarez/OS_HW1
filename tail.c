@@ -10,15 +10,15 @@
 
 void close_prog(List *LL, int fd, char str[])
 {
+  char *temp;
+
   if (*str != '\0') {
     my_write(fileno(stderr), str, str_len(str));
   }
   //deallocate everything that has been allocated
   if (fd != 0) {
     if (close(fd) < 0) {
-      temp = concat("Error closing file \"", filename);
-      temp = concat(temp, "\": ");
-      temp = concat(temp, strerror(errno));
+      temp = concat("Error closing file: ", strerror(errno));
       temp = concat(temp, "\n");
       my_write(fileno(stderr), temp, str_len(temp));
     }
