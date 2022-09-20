@@ -91,8 +91,15 @@ int main(int argc, char **argv)
     }
   }
 
-  if (fd != 0)
-    close(fd);
+  if (fd != 0) {
+    if (close(fd) < 0) {
+      temp = concat("Error closing file \"", filename);
+      temp = concat(temp, "\": ");
+      temp = concat(temp, strerror(errno));
+      temp = concat(temp, "\n");
+      my_write(fileno(stderr), temp, str_len(temp));
+    }
+  }
 
   return 0;
 }

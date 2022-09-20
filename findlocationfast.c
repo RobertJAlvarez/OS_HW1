@@ -15,11 +15,11 @@ typedef struct {
 void close_file(int fd, char *filename)
 {
   char *temp;
-  temp = concat("Error closing file \"", filename);
-  temp = concat(temp, "\": ");
-  temp = concat(temp, strerror(errno));
-  temp = concat(temp, "\n");
   if (close(fd) < 0) {
+    temp = concat("Error closing file \"", filename);
+    temp = concat(temp, "\": ");
+    temp = concat(temp, strerror(errno));
+    temp = concat(temp, "\n");
     my_write(fileno(stderr), temp, str_len(temp));
   }
 }
