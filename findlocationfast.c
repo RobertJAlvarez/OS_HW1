@@ -90,7 +90,7 @@ int main(int argc, char **argv)
 
   //if first argument is not given or if first argument have anything that is not a number
   if ((argc < 3) || !only_digits(argv[2])) {
-    temp = "Enter a North American phone number prefix with only the first 6 numbers.";
+    temp = "Enter a North American phone number prefix with only the first 6 numbers.\n";
     my_write(1, temp, str_len(temp));
     return 1;
   }
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
   //If line was not found, print error message and die
   if (place == NULL) {
     temp = concat("Code didn't match a North American phone number with prefix ", number);
-    temp = concat(temp, " in nanpa.");
+    temp = concat(temp, " in nanpa.\n");
     my_write(fileno(stderr), temp, str_len(temp));
   } else {
     temp = "Place: ";
