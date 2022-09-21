@@ -4,7 +4,7 @@
 #include <sys/mman.h> //mmap(), munmap()
 #include <errno.h>    //errno
 #include <string.h>   //strerror()
-#include "my_c.h"     //my_write()
+#include "my_c.h"     //my_write(), concat()
 
 typedef struct {
  char number[6];
@@ -33,8 +33,7 @@ int only_digits(char *s)
 
 int compare_entries(char *s1, char *s2)
 {
-  char *t1;
-  char *t2;
+  char *t1, *t2;
 
   for (t1 = s1, t2 = s2; *t1 && (*t1 == *t2); t1++, t2++);
 
@@ -100,7 +99,7 @@ int main(int argc, char **argv)
   number = argv[2];
 
   fd = open(filename, O_RDONLY);
-  
+
   if (fd < 0) {
     temp = concat("Error opening file \"", filename);
     temp = concat(temp, "\": ");

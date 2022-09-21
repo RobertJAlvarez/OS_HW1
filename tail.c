@@ -45,7 +45,7 @@ int main(int argc, char **argv)
     //if (str_cmp(argv[i],n_char) == 0) { // Check if the argument is -n
     if (str_cmp(argv[i],(char *)"-n") == 0) { // Check if the argument is -n
       if (++i >= argc) {  //If there is nothing after -n
-        temp = "tail: option requires an argument -- n\nusage: tail [-F | -f | -r] [-q] [-b # | -c # | -n #] [file ...]\n";
+        temp = "tail: option requires an argument -- n\nusage: tail [-n #] [file]\n";
         my_write(fileno(stderr), temp, str_len(temp));
         return 1;
       }
