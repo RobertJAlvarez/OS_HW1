@@ -20,6 +20,6 @@ echo The last 42 lines of nanpa are:
 tail -n 42 nanpa
 
 ##This next part is to test something, plis don't erase it
-dd if=/dev/zero bs=512 count=10000 | tr '\0' 'A' > file1
-./head -n 5 < file1 > file2
-diff file1 file2
+#dd if=/dev/zero bs=512 count=10000 | tr '\0' 'A' > file1
+#./head -n 5 < file1 > file2
+#diff file1 file2
