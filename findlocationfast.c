@@ -12,6 +12,7 @@ typedef struct {
  char newline;
 } entry_t;
 
+/* Close the file, if successful do nothing, otherwise print an error message. */
 void close_file(int fd, char *filename)
 {
   char *temp;
@@ -24,6 +25,7 @@ void close_file(int fd, char *filename)
   }
 }
 
+/* Check that there are only six digits being point to. */
 int only_digits(char *s)
 {
   char count = 0;
@@ -31,6 +33,7 @@ int only_digits(char *s)
   return count == 6 ? 1 : 0;
 }
 
+/* Check if s1 and s2 are the same, if the first character are the same we return 0 otherwise its difference. */
 int compare_entries(char *s1, char *s2)
 {
   char *t1, *t2;
@@ -42,6 +45,9 @@ int compare_entries(char *s1, char *s2)
   return *t1 - *t2;
 }
 
+/* Perform binary search on the dictionary (seekable file mapped to memory with a struct that match the content of each line)
+ * to find the line with a phone number that match the one passed.
+ */
 char *lookup_time(entry_t dict[], ssize_t num_entries, char *number)
 {
   ssize_t l, r, m;
@@ -65,6 +71,9 @@ char *lookup_time(entry_t dict[], ssize_t num_entries, char *number)
   return NULL;
 }
 
+/* Search for the last character that is not a white space and print from the first character to
+ * the last non-white space
+ */
 void print_trimmed(char *ptr)
 {
   char *last_no_space;
@@ -100,7 +109,7 @@ int main(int argc, char **argv)
 
   fd = open(filename, O_RDONLY);
 
-  if (fd < 0) {
+  if (fd < 0) { //If file was unsuccessfully opened
     temp = concat("Error opening file \"", filename);
     temp = concat(temp, "\": ");
     temp = concat(temp, strerror(errno));
@@ -111,7 +120,7 @@ int main(int argc, char **argv)
 
   lseek_res = lseek(fd, (off_t) 0, SEEK_END);
 
-  if (lseek_res == (off_t) -1) {
+  if (lseek_res == (off_t) -1) {  //If we couldn't seek to the end of the file
     temp = concat("Error seeking file \"", filename);
     temp = concat(temp, "\": ");
     temp = concat(temp, strerror(errno));
@@ -123,6 +132,8 @@ int main(int argc, char **argv)
 
   file_size = (size_t) lseek_res;
 
+  //If the size of the file is not divisible by the size of our struct, meaning that
+  //the format is incorrect or that the file is not seekable
   if ((file_size % sizeof(entry_t)) != ((size_t) 0)) {
     temp = concat("The file \"", filename);
     temp = concat(temp, "\" is not properly formatted.\n");
@@ -133,9 +144,9 @@ int main(int argc, char **argv)
 
   ptr = mmap(NULL, file_size, PROT_READ, MAP_SHARED, fd, 0);
 
-  close_file(fd, filename);
+  close_file(fd, filename); //We don't need the file anymore
 
-  if (ptr == MAP_FAILED) {
+  if (ptr == MAP_FAILED) {  //If mapping the file to memory failed
     temp = concat("Error mapping file \"", filename);
     temp = concat(temp, "\" in memory: ");
     temp = concat(temp, strerror(errno));
@@ -159,7 +170,8 @@ int main(int argc, char **argv)
     my_write(1, "\n", 2);
   }
 
-  if (munmap(ptr, file_size) != 0) {
+  //unmap the file from memory
+  if (munmap(ptr, file_size) != 0) {  //If unmaping was unsuccessful
     temp = concat("Error unmapping file \"", filename);
     temp = concat(temp, "\" in memory: ");
     temp = concat(temp, strerror(errno));

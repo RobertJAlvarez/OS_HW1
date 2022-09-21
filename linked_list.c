@@ -16,12 +16,13 @@ List *init_LL(int k)
 
 /* Add a history item to the end of the list.
    List* list - the linked list
-   char* str - the string to store */
+   char* str - the string to store
+   size_t length - the number of bytes use by str */
 ssize_t add_item(List *list, char *str, size_t length)
 {
-  Item *new = malloc(sizeof(Item));
+  Item *new = malloc(sizeof(Item)); //Make space for the new Item
 
-  if (new == NULL) return -1;
+  if (new == NULL) return -1; //If we couldn't get the space needed from malloc
 
   if (list->head == NULL) {   //If list is empty
     list->n_Lines = 1;
@@ -35,6 +36,7 @@ ssize_t add_item(List *list, char *str, size_t length)
       move_head(list);  //Move head one up and free space used by previous head
   }
 
+  //Populate the information of the new Item
   new->str = str;
   new->length = length;
   new->next = NULL;
@@ -57,7 +59,7 @@ void move_head(List *list)
   return;
 }
 
-/*Print the entire contents of the list. */
+/*Print the entire content of the list. */
 ssize_t print_lines(List *list)
 {
   Item *curr = list->head;

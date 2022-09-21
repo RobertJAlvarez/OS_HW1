@@ -91,8 +91,8 @@ int main(int argc, char **argv)
     }
   }
 
-  if (fd != 0) {
-    if (close(fd) < 0) {
+  if (fd != 0) {  //If file is not zero it means we read information from file so we try to close it
+    if (close(fd) < 0) {  //If closing is successful
       temp = concat("Error closing file \"", file);
       temp = concat(temp, "\": ");
       temp = concat(temp, strerror(errno));

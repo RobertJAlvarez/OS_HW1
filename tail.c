@@ -8,6 +8,9 @@
 
 #define BUFFER_LEN (4096)
 
+/* Free the space used by the Linked list, Items, strings in Items, close the file
+ * and print an error message of why this is been done.
+ */
 void close_prog(List *LL, int fd, char str[])
 {
   char *temp;

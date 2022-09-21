@@ -54,9 +54,9 @@ char *concat(char *s1, char *s2)
   char *new_str = malloc(new_len);
   if (new_str == NULL) return NULL; //Not enough space in malloc
   char *temp = new_str;
-  while ( (*new_str++ = *s1++) );
-  new_str--;
-  while ( (*new_str++ = *s2++) );
+  while ( (*new_str++ = *s1++) ); //Copy first "string"
+  new_str--;  //Go to '\0' to overwrite it
+  while ( (*new_str++ = *s2++) ); //Copy second "string"
   return temp;
 }
 
