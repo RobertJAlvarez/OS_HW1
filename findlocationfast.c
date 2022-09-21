@@ -76,7 +76,7 @@ char *lookup_time(entry_t dict[], ssize_t num_entries, char *number)
  */
 void print_trimmed(char *ptr)
 {
-  char *last_no_space;
+  char *last_no_space = ptr;
 
   for (int i = 0; i < 25; i++) {
     if (ptr[i] != ' ')
